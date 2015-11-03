@@ -60,13 +60,13 @@ class DCImportCertificateWindowController: NSWindowController, NSWindowDelegate,
 
     @IBAction func getServerDataButtonPressed(sender: AnyObject) {
         if let url = NSURL(string: "https://" + urlTextField.stringValue) {
-            println("url scheme: \(url.scheme) absolute: \(url.absoluteString)")
+            print("url scheme: \(url.scheme) absolute: \(url.absoluteString)")
             if url.scheme != nil {
                 let request = NSURLRequest(URL: url)
                 if let connection = NSURLConnection(request: request, delegate: self, startImmediately: false) {
                     connection.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSRunLoopCommonModes)
                     connection.start()
-                    println("Connection started")
+                    print("Connection started")
                     infoTextField.stringValue = "Connecting..."
                 }
             }
@@ -131,7 +131,7 @@ class DCImportCertificateWindowController: NSWindowController, NSWindowDelegate,
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let result = tableView.makeViewWithIdentifier("DataCell", owner: self) as? NSTableCellView {
             if certificates != nil {
-                if let summary = SecCertificateCopySubjectSummary(certificates![row])?.takeRetainedValue() as? String {
+                if let summary = SecCertificateCopySubjectSummary(certificates![row]).takeRetainedValue() as? String {
                     result.textField!.stringValue = summary
                 }
                 else {

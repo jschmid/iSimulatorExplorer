@@ -14,7 +14,7 @@ class DCSimulatorManager {
     private let kDVTFoundationRelativePath = "../SharedFrameworks/DVTFoundation.framework"
     private let kDevToolsFoundationRelativePath = "../OtherFrameworks/DevToolsFoundation.framework"
     private let kSimulatorRelativePath = "Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone Simulator.app"
-    private let sim5BasePath = "~/Library/Application Support/iPhone Simulator".stringByExpandingTildeInPath
+    private let sim5BasePath = ("~/Library/Application Support/iPhone Simulator" as NSString).stringByExpandingTildeInPath
     private var simDeviceSetClass : AnyClass?
     private var simDeviceSet : AnyObject?
     private var getSimulators : () -> [Simulator]
@@ -37,7 +37,7 @@ class DCSimulatorManager {
             
             // The Simulator framework depends on some of the other Xcode private
             // frameworks; manually load them first so everything can be linked up.
-            let dvtFoundationPath = developerDir.stringByAppendingPathComponent(kDVTFoundationRelativePath)
+            let dvtFoundationPath = (developerDir as NSString).stringByAppendingPathComponent(kDVTFoundationRelativePath)
             
             if let dvtFoundationBundle = NSBundle(path: dvtFoundationPath) {
                 if !(dvtFoundationBundle.load()) {
@@ -45,7 +45,7 @@ class DCSimulatorManager {
                 }
             }
             
-            let devToolsFoundationPath = developerDir.stringByAppendingPathComponent(kDevToolsFoundationRelativePath)
+            let devToolsFoundationPath = (developerDir as NSString).stringByAppendingPathComponent(kDevToolsFoundationRelativePath)
             if let devToolsFoundationBundle = NSBundle(path: devToolsFoundationPath) {
                 if !(devToolsFoundationBundle.load()) {
                     return nil
@@ -65,13 +65,13 @@ class DCSimulatorManager {
             // The path within the developer dir of the private Simulator frameworks.
             let simulatorFrameworkRelativePath = "../SharedFrameworks/DVTiPhoneSimulatorRemoteClient.framework";
             let kCoreSimulatorRelativePath = "Library/PrivateFrameworks/CoreSimulator.framework";
-            let coreSimulatorPath = developerDir.stringByAppendingPathComponent(kCoreSimulatorRelativePath);
+            let coreSimulatorPath = (developerDir as NSString).stringByAppendingPathComponent(kCoreSimulatorRelativePath);
             if let coreSimulatorBundle = NSBundle(path: coreSimulatorPath) {
                 if !(coreSimulatorBundle.load()) {
                     return nil
                 }
             }
-            let simBundlePath = developerDir.stringByAppendingPathComponent(simulatorFrameworkRelativePath);
+            let simBundlePath = (developerDir as NSString).stringByAppendingPathComponent(simulatorFrameworkRelativePath);
             if let simBundle = NSBundle(path: simBundlePath) {
                 if !(simBundle.load()) {
                     return nil
@@ -92,7 +92,7 @@ class DCSimulatorManager {
         if simDeviceSet != nil  {
             if let deviceList = simDeviceSet!.availableDevices {
                 for simDevice in deviceList {
-                    var sim = Simulator(device: simDevice)
+                    let sim = Simulator(device: simDevice)
                     if sim.isValid {
                         simulators.append(sim)
                     }
@@ -107,16 +107,16 @@ class DCSimulatorManager {
         
         var simulators = [Simulator]()
         
-        let simBasePath = "~/Library/Developer/CoreSimulator/Devices".stringByExpandingTildeInPath
-        if let fileList1 = NSFileManager.defaultManager().contentsOfDirectoryAtPath(simBasePath, error: nil) {
+        let simBasePath = ("~/Library/Developer/CoreSimulator/Devices" as NSString).stringByExpandingTildeInPath
+        if let fileList1 = try? NSFileManager.defaultManager().contentsOfDirectoryAtPath(simBasePath) {
             if let fileList = fileList1 as? [String] {
                 for item in fileList
                 {
-                    println("item is \(item)")
+                    print("item is \(item)")
                     
-                    let path = simBasePath.stringByAppendingPathComponent(item)
+                    let path = (simBasePath as NSString).stringByAppendingPathComponent(item)
                     
-                    var sim = Simulator(path: path)
+                    let sim = Simulator(path: path)
                     if sim.isValid {
                         simulators.append(sim);
                     }

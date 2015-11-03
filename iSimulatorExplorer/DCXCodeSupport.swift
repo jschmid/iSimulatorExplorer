@@ -14,8 +14,11 @@ class XCodeSupport {
             return developerDir
         }
         var error : NSError?
-        if let symDir = NSFileManager.defaultManager().destinationOfSymbolicLinkAtPath("/var/db/xcode_select_link", error: &error) {
+        do {
+            let symDir = try NSFileManager.defaultManager().destinationOfSymbolicLinkAtPath("/var/db/xcode_select_link")
             return symDir
+        } catch var error1 as NSError {
+            error = error1
         }
         let defaultDir = "/Applications/Xcode.app/Contents/Developer"
         if NSFileManager.defaultManager().fileExistsAtPath(defaultDir) {
@@ -27,14 +30,19 @@ class XCodeSupport {
     class func getDeveloperToolsVersion() -> String? {
         if let developerDir = getDeveloperToolsPath() {
             let fm = NSFileManager.defaultManager()
-            let versionPlist = developerDir.stringByAppendingPathComponent("../version.plist")
+            let versionPlist = (developerDir as NSString).stringByAppendingPathComponent("../version.plist")
             if fm.fileExistsAtPath(versionPlist) {
                 let versionPlistData = NSFileManager.defaultManager().contentsAtPath(versionPlist)!
                 var error : NSError?
-                let plistobj: AnyObject? = NSPropertyListSerialization.propertyListWithData(versionPlistData,
-                    options: 0,
-                    format: nil,
-                    error: &error)
+                let plistobj: AnyObject?
+                do {
+                    plistobj = try NSPropertyListSerialization.propertyListWithData(versionPlistData,
+                                        options: 0,
+                                        format: nil)
+                } catch var error1 as NSError {
+                    error = error1
+                    plistobj = nil
+                }
                 if let plist = plistobj as? Dictionary<String, AnyObject> {
                     return plist["CFBundleShortVersionString"] as? String
                 }

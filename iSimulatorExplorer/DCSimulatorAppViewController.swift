@@ -90,7 +90,7 @@ class DCSimulatorAppViewController: DCSimulatorViewController, NSTableViewDataSo
     }
     
     @IBAction func installApp(sender: AnyObject) {
-        var openPanel = NSOpenPanel()
+        let openPanel = NSOpenPanel()
         openPanel.canChooseFiles = true
         openPanel.canChooseDirectories = false
         openPanel.allowsMultipleSelection = false
@@ -107,10 +107,10 @@ class DCSimulatorAppViewController: DCSimulatorViewController, NSTableViewDataSo
                             AppDelegate.showModalAlert(
                                 NSLocalizedString("Error installing app \(url)", comment: ""),
                                 informativeText: "Error details: \(error)")
-                            println("Install app \(url) error: \(error!)")
+                            print("Install app \(url) error: \(error!)")
                         }
                         else {
-                            println("Install app \(url) successful")
+                            print("Install app \(url) successful")
                             self.simulatorAppList = self.simulator!.getAppList()
                             self.appTableView.reloadData()
                         }
@@ -136,7 +136,7 @@ class DCSimulatorAppViewController: DCSimulatorViewController, NSTableViewDataSo
                             informativeText: "Error details: \(error)")
                     }
                     else {
-                        println("Uninstall app \(appId) successful")
+                        print("Uninstall app \(appId) successful")
                         self.simulatorAppList = self.simulator!.getAppList()
                         self.appTableView.reloadData()
                     }

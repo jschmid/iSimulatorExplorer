@@ -64,7 +64,7 @@ class Simulator {
     }
     
     private func initTrustStorePath() {
-        trustStorePath = path?.stringByAppendingPathComponent("data/Library/Keychains/TrustStore.sqlite3")
+        trustStorePath = (path? as NSString).stringByAppendingPathComponent("data/Library/Keychains/TrustStore.sqlite3")
     }
     
     private func initDeviceType (runtimeIdentifier : String?)
@@ -75,15 +75,20 @@ class Simulator {
     convenience init(path : String) {
         self.init()
         self.path = path
-        let devicePlist = path.stringByAppendingPathComponent("device.plist")
+        let devicePlist = (path as NSString).stringByAppendingPathComponent("device.plist")
         let fm = NSFileManager.defaultManager()
         if fm.fileExistsAtPath(devicePlist) {
             let plistData = fm.contentsAtPath(devicePlist)!
             var error : NSError?
-            let plistobj : AnyObject? = NSPropertyListSerialization.propertyListWithData(plistData,
-                options: 0,
-                format: nil,
-                error: &error)
+            let plistobj : AnyObject?
+            do {
+                plistobj = try NSPropertyListSerialization.propertyListWithData(plistData,
+                                options: 0,
+                                format: nil)
+            } catch var error1 as NSError {
+                error = error1
+                plistobj = nil
+            }
             if let plist = plistobj as? Dictionary<String, AnyObject> {
                 let deviceType = plist["deviceType"] as? String
                 let name1 = plist["name"] as? String
@@ -116,19 +121,24 @@ class Simulator {
     func getAppDataDirMap() -> [String : String] {
         var map = [String : String]()
         let fm = NSFileManager.defaultManager()
-        let appDataContainerFolder = self.path!.stringByAppendingPathComponent("data/Containers/Data/Application")
-        if let dataFolders = fm.contentsOfDirectoryAtPath(appDataContainerFolder, error: nil) as? [String] {
+        let appDataContainerFolder = (self.path! as NSString).stringByAppendingPathComponent("data/Containers/Data/Application")
+        if let dataFolders = (try? fm.contentsOfDirectoryAtPath(appDataContainerFolder)) as? [String] {
             for folderName in dataFolders {
-                let folderPath = appDataContainerFolder.stringByAppendingPathComponent(folderName)
-                let metadataInfoFile = folderPath.stringByAppendingPathComponent(".com.apple.mobile_container_manager.metadata.plist")
+                let folderPath = (appDataContainerFolder as NSString).stringByAppendingPathComponent(folderName)
+                let metadataInfoFile = (folderPath as NSString).stringByAppendingPathComponent(".com.apple.mobile_container_manager.metadata.plist")
                 if fm.fileExistsAtPath(metadataInfoFile) {
                     
                     let plistData = fm.contentsAtPath(metadataInfoFile)!
                     var error : NSError?
-                    let plistobj : AnyObject? = NSPropertyListSerialization.propertyListWithData(plistData,
-                        options: 0,
-                        format: nil,
-                        error: &error)
+                    let plistobj : AnyObject?
+                    do {
+                        plistobj = try NSPropertyListSerialization.propertyListWithData(plistData,
+                                                options: 0,
+                                                format: nil)
+                    } catch var error1 as NSError {
+                        error = error1
+                        plistobj = nil
+                    }
                     if let identifier = (plistobj as? Dictionary<String, AnyObject>)?["MCMMetadataIdentifier"] as? String {
                         map[identifier] = folderPath
                     }
@@ -140,18 +150,23 @@ class Simulator {
     
     func getAppInfoFromFolder(path : String) -> SimulatorApp? {
         let fm = NSFileManager.defaultManager()
-        if let bundleFolders = fm.contentsOfDirectoryAtPath(path, error: nil) as? [String] {
+        if let bundleFolders = (try? fm.contentsOfDirectoryAtPath(path)) as? [String] {
             for filename in bundleFolders {
-                let bundleFolder = path.stringByAppendingPathComponent(filename)
-                let appInfoFile = bundleFolder.stringByAppendingPathComponent("info.plist")
+                let bundleFolder = (path as NSString).stringByAppendingPathComponent(filename)
+                let appInfoFile = (bundleFolder as NSString).stringByAppendingPathComponent("info.plist")
                 if fm.fileExistsAtPath(appInfoFile) {
                     
                     let plistData = fm.contentsAtPath(appInfoFile)!
                     var error : NSError?
-                    let plistobj : AnyObject? = NSPropertyListSerialization.propertyListWithData(plistData,
-                        options: 0,
-                        format: nil,
-                        error: &error)
+                    let plistobj : AnyObject?
+                    do {
+                        plistobj = try NSPropertyListSerialization.propertyListWithData(plistData,
+                                                options: 0,
+                                                format: nil)
+                    } catch var error1 as NSError {
+                        error = error1
+                        plistobj = nil
+                    }
                     if let plist = plistobj as? Dictionary<String, AnyObject> {
                         let appInfo = SimulatorApp(appInfo: plist)
                         appInfo.path = path
@@ -172,10 +187,10 @@ class Simulator {
         
         let fm = NSFileManager.defaultManager()
         // For iOS < 8.0
-        let appDataContainerFolder = self.path!.stringByAppendingPathComponent("data/Applications")
-        if let dataFolders = fm.contentsOfDirectoryAtPath(appDataContainerFolder, error: nil) as? [String] {
+        let appDataContainerFolder = (self.path! as NSString).stringByAppendingPathComponent("data/Applications")
+        if let dataFolders = (try? fm.contentsOfDirectoryAtPath(appDataContainerFolder)) as? [String] {
             for folderName in dataFolders {
-                let folderPath = appDataContainerFolder.stringByAppendingPathComponent(folderName)
+                let folderPath = (appDataContainerFolder as NSString).stringByAppendingPathComponent(folderName)
                 if let appInfo = getAppInfoFromFolder(folderPath) {
                     if includeAppFilter(appInfo) {
                         appInfo.dataPath = appInfo.path
@@ -189,10 +204,10 @@ class Simulator {
             let map = getAppDataDirMap()
             
             // For iOS >= 8.0
-            let appDataContainerFolder = self.path!.stringByAppendingPathComponent("data/Containers/Bundle/Application")
-            if let dataFolders = fm.contentsOfDirectoryAtPath(appDataContainerFolder, error: nil) as? [String] {
+            let appDataContainerFolder = (self.path! as NSString).stringByAppendingPathComponent("data/Containers/Bundle/Application")
+            if let dataFolders = (try? fm.contentsOfDirectoryAtPath(appDataContainerFolder)) as? [String] {
                 for folderName in dataFolders {
-                    let folderPath = appDataContainerFolder.stringByAppendingPathComponent(folderName)
+                    let folderPath = (appDataContainerFolder as NSString).stringByAppendingPathComponent(folderName)
                     if let appInfo = getAppInfoFromFolder(folderPath) {
                         if includeAppFilter(appInfo) {
                             appInfo.dataPath = map[appInfo.identifier!]
@@ -265,7 +280,7 @@ class Simulator {
             }
             let fm = NSFileManager.defaultManager()
             for testPath in possibleAppPath {
-                var path = devPath.stringByAppendingPathComponent(testPath)
+                var path = (devPath as NSString).stringByAppendingPathComponent(testPath)
                 if fm.fileExistsAtPath(path) {
                     appPath = path
                     break
@@ -280,11 +295,12 @@ class Simulator {
                     [NSWorkspaceLaunchConfigurationArguments : ["-CurrentDeviceUDID", UDID!.UUIDString]] : [String : AnyObject]()
                 
                 NSLog("Launching iOS Simulator with \(launchArg)")
-                if let runningApp = workspace.launchApplicationAtURL(appUrl, options: NSWorkspaceLaunchOptions.Default, configuration: launchArg, error: &error) {
+                do {
+                    let runningApp = try workspace.launchApplicationAtURL(appUrl, options: NSWorkspaceLaunchOptions.Default, configuration: launchArg)
                     NSLog("Simulator started. PID=%u", runningApp.processIdentifier)
                     result = true
-                }
-                else {
+                } catch var error1 as NSError {
+                    error = error1
                     NSLog("Error launching simulator: %@", error!)
                 }
                 

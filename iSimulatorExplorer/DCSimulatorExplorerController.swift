@@ -43,7 +43,7 @@ class DCSimulatorExplorerController: NSObject, NSWindowDelegate, NSOutlineViewDe
             if _simulators == nil {
                 _simulators = [SimulatorVersion]()
                 
-                var firstInit = (simulatorManager == nil)
+                let firstInit = (simulatorManager == nil)
                 if firstInit {
                     simulatorManager = DCSimulatorManager()
                 }
@@ -53,14 +53,14 @@ class DCSimulatorExplorerController: NSObject, NSWindowDelegate, NSOutlineViewDe
                     var simulatorsByVersion = [String : [Simulator]]()
                     for sim in self.simulatorManager!.simulators {
                         if simulatorsByVersion[sim.version!] == nil {
-                            var simulators = [Simulator]()
+                            let simulators = [Simulator]()
                             simulatorsByVersion[sim.version!] = simulators
                         }
                         simulatorsByVersion[sim.version!]?.append(sim)
                         
                     }
                     var sortedKeys = simulatorsByVersion.keys.array
-                    sortedKeys.sort({ (s1, s2) -> Bool in
+                    sortedKeys.sortInPlace({ (s1, s2) -> Bool in
                         return s2 > s1
                     })
                     var simulatorVersions = [SimulatorVersion]()

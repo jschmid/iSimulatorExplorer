@@ -98,6 +98,7 @@
 		6590378219E9CA0400C4C366 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Cerutti Software Design";
 				TargetAttributes = {

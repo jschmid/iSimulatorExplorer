@@ -31,7 +31,7 @@ class DCSimulatorInfoViewController: DCSimulatorViewController, NSTableViewDataS
             if simulator!.UDID != nil {
                 infoItems.append(DCInfoViewItem(name: NSLocalizedString("UDID:", comment: ""), value: simulator!.UDID!.UUIDString))
             }
-            infoItems.append(DCInfoViewItem(name: NSLocalizedString("Path:", comment: ""), value: simulator!.path?.stringByAbbreviatingWithTildeInPath ?? empty))
+            infoItems.append(DCInfoViewItem(name: NSLocalizedString("Path:", comment: ""), value: (simulator!.path? as NSString).stringByAbbreviatingWithTildeInPath ?? empty))
             if simulator!.stateString != nil {
                 infoItems.append(DCInfoViewItem(name: NSLocalizedString("State:", comment: ""), value: simulator!.stateString!))
             }

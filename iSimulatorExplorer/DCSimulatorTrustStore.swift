@@ -75,7 +75,7 @@ class DCSimulatorTruststoreItem {
     
     func calcSHA1(data : NSData) -> NSData {
         
-        var digest = NSMutableData(length: Int(CC_SHA1_DIGEST_LENGTH))
+        let digest = NSMutableData(length: Int(CC_SHA1_DIGEST_LENGTH))
         CC_SHA1(data.bytes, CC_LONG(data.length), UnsafeMutablePointer<UInt8>(digest!.mutableBytes))
         return digest!
     }
@@ -104,7 +104,7 @@ class DCSimulatorTruststoreItem {
         var result = false
         if let cert = certificate {
             var outData : Unmanaged<CFData>?
-            let status = SecItemExport(cert, SecExternalFormat(kSecFormatUnknown), SecItemImportExportFlags(kSecItemPemArmour), nil, &outData)
+            let status = SecItemExport(cert, SecExternalFormat.FormatUnknown, SecItemImportExportFlags.PemArmour, nil, outData)
             if status == errSecSuccess {
                 if let cdata = outData?.takeRetainedValue() {
                     let data = cdata as NSData
